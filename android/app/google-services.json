@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "933006585739",
+    "firebase_url": "https://log-location.firebaseio.com",
+    "project_id": "log-location",
+    "storage_bucket": "log-location.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933006585739:android:2499df2a8773dcd2cf898e",
+        "android_client_info": {
+          "package_name": "com.deandreamatias.log_location"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933006585739-t24jfumkdju82i4eep5utopbtde8k3qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmJZu1nz4nRStVLqfnR8H0ZmOgJtibxz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933006585739-t24jfumkdju82i4eep5utopbtde8k3qk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
