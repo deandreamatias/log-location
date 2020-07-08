@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../ui/views/home/home_viewmodel.dart';
@@ -10,7 +11,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<HomeViewModel>.reactive(
       viewModelBuilder: () => HomeViewModel(),
-      onModelReady: (model) => model.init(),
+      onModelReady: (model) async => await model.init(),
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -22,6 +23,8 @@ class HomeView extends StatelessWidget {
               )
             ],
           ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
           floatingActionButton: FloatingActionButton(
             onPressed: () => model.getLocation(),
             child: model.isBusy
@@ -39,7 +42,16 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Container(),
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                    target: model.latLng,
+                    zoom: 15.0,
+                  ),
+                  onMapCreated: (GoogleMapController controller) {
+                    model.controller.complete(controller);
+                  },
+                ),
               )
             ],
           ),
