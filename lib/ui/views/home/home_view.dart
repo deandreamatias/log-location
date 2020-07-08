@@ -10,6 +10,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<HomeViewModel>.reactive(
       viewModelBuilder: () => HomeViewModel(),
+      onModelReady: (model) => model.init(),
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -20,6 +21,14 @@ class HomeView extends StatelessWidget {
                 onPressed: () async => await model.logout(),
               )
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => model.getLocation(),
+            child: model.isBusy
+                ? CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  )
+                : Icon(Icons.location_searching),
           ),
           body: Column(
             children: <Widget>[
