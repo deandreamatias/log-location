@@ -10,44 +10,48 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<LoginViewModel>.nonReactive(
-        viewModelBuilder: () => LoginViewModel(),
-        builder: (context, model, child) {
-          return Scaffold(
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    _StringForm(),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        RaisedButton(
-                          onPressed: () => model.signIn(),
-                          child: Text('LOGIN'),
-                        )
-                      ],
-                    )
-                  ],
-                ),
+    return ViewModelBuilder<LoginViewModel>.reactive(
+      viewModelBuilder: () => LoginViewModel(),
+      builder: (context, model, child) {
+        return Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _LoginForm(),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      RaisedButton(
+                        onPressed: () async => await model.signIn(),
+                        child: model.isBusy
+                            ? SizedBox(
+                                height: 24.0,
+                                width: 24.0,
+                                child: CircularProgressIndicator(),
+                              )
+                            : Text('LOGIN'),
+                      )
+                    ],
+                  )
+                ],
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
-class _StringForm extends HookViewModelWidget<LoginViewModel> {
-  _StringForm({Key key}) : super(key: key, reactive: false);
+class _LoginForm extends HookViewModelWidget<LoginViewModel> {
+  _LoginForm({Key key}) : super(key: key, reactive: false);
 
   @override
-  Widget buildViewModelWidget(
-    BuildContext context,
-    LoginViewModel model,
-  ) {
+  Widget buildViewModelWidget(BuildContext context, LoginViewModel model) {
     var email = useTextEditingController();
     var password = useTextEditingController();
     return Column(

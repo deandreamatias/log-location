@@ -1,8 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
+
+import '../../../app/locator.dart';
+import '../../../app/router.gr.dart';
 
 class LoginViewModel extends BaseViewModel {
+  final NavigationService _navigationService = locator<NavigationService>();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   FirebaseUser _user;
@@ -16,13 +21,17 @@ class LoginViewModel extends BaseViewModel {
   bool get hasUser => _user != null && _user.uid.isNotEmpty;
 
   Future<void> signIn() async {
+    setBusy(true);
     _user = (await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     ))
         .user;
-    debugPrint("Signed in: " + user.email);
-    notifyListeners();
+    if (hasUser) {
+      debugPrint("Signed in: " + user.email);
+      await _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
+    }
+    setBusy(false);
   }
 
   void updateEmail(String value) {
