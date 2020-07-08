@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
@@ -23,19 +24,29 @@ class HomeViewModel extends BaseViewModel {
     await _locationService.init();
   }
 
-  Future<void> getLocation() async {
+  Future<void> getLocation({bool random = false}) async {
     setBusy(true);
     await _locationService.getLocation();
-    _travel();
+    _travel(random);
     setBusy(false);
   }
 
-  Future<void> _travel() async {
+  Future<void> _travel(bool random) async {
     final GoogleMapController controller = await _controller.future;
-    _latLng = LatLng(
-      _locationService.locationData.latitude,
-      _locationService.locationData.longitude,
-    );
+    if (random) {
+      // Get random double to generate random location
+      final Random random = Random();
+      final double randomOffset = random.nextDouble() * 0.1;
+      _latLng = LatLng(
+        _locationService.locationData.latitude - randomOffset,
+        _locationService.locationData.longitude - randomOffset,
+      );
+    } else {
+      _latLng = LatLng(
+        _locationService.locationData.latitude,
+        _locationService.locationData.longitude,
+      );
+    }
     controller.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(target: _latLng, zoom: 15.0),
