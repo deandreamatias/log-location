@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../../services/database_service.dart';
 import '../../../models/log_location.dart';
 import '../../../services/auth_service.dart';
 import '../../../app/locator.dart';
@@ -15,34 +16,34 @@ class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
   final LocationService _locationService = locator<LocationService>();
   final AuthService _authService = locator<AuthService>();
+  final DatabaseService _databaseService = DatabaseService();
 
   LatLng _latLng;
-  List<LogLocation> _list = [];
   Completer<GoogleMapController> _controller = Completer();
 
   LatLng get latLng => _latLng;
-  List<LogLocation> get list => _list;
+  Stream<List<LogLocation>> get list => _databaseService.listLocation;
   Completer<GoogleMapController> get controller => _controller;
-  String get userId => _authService.hasUser ? _authService.user.uid : 'No user';
-  bool get hasListItems => _list != null && _list.isNotEmpty;
+  String get userId => _authService.user.uid;
 
   Future<void> init() async {
     _latLng = LatLng(37.43296265331129, -122.08832357078792);
     await _locationService.init();
+    await _databaseService.init(userId);
+    notifyListeners();
   }
 
   Future<void> getLocation({bool random = false}) async {
     setBusy(true);
     await _locationService.getLocation();
     _travel(random);
-    _list
-      ..add(LogLocation(
-        latitude: _latLng.latitude,
-        longitude: _latLng.longitude,
-        altitude: _locationService.locationData.altitude,
-        dateTime: DateTime.now(),
-        uid: _authService.user.uid,
-      ));
+    _databaseService.addLogLocation(LogLocation(
+      latitude: _latLng.latitude,
+      longitude: _latLng.longitude,
+      altitude: _locationService.locationData.altitude,
+      dateTime: DateTime.now(),
+      uid: _authService.user.uid,
+    ));
     setBusy(false);
   }
 
@@ -63,7 +64,12 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
+  Future<void> clearList() async {
+    await _databaseService.clear();
+  }
+
   Future<void> logout() async {
+    await _databaseService.close();
     await _navigationService.pushNamedAndRemoveUntil(Routes.loginView);
   }
 }

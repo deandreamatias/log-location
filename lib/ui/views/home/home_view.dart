@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../../models/log_location.dart';
 import '../../widgets/log_location_widget.dart';
 import '../../views/home/home_viewmodel.dart';
 
@@ -19,13 +20,17 @@ class HomeView extends StatelessWidget {
               color: Colors.lightBlueAccent,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.directions_run),
+                    icon: Icon(Icons.my_location),
                     tooltip: 'Get random close location',
-                    onPressed: () async =>
-                        await model.getLocation(random: true),
+                    onPressed: () async => await model.getLocation(),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.clear_all),
+                    tooltip: 'Clear list',
+                    onPressed: () async => await model.clearList(),
                   ),
                   IconButton(
                     icon: Icon(Icons.exit_to_app),
@@ -36,9 +41,9 @@ class HomeView extends StatelessWidget {
             ),
             primary: false,
             floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
+                FloatingActionButtonLocation.endDocked,
             floatingActionButton: FloatingActionButton(
-              onPressed: () async => await model.getLocation(),
+              onPressed: () async => await model.getLocation(random: true),
               child: model.isBusy
                   ? CircularProgressIndicator(
                       backgroundColor: Colors.white,
@@ -61,14 +66,38 @@ class HomeView extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: model.hasListItems
-                        ? ListView.builder(
-                            itemCount: model.list.length,
-                            itemBuilder: (context, index) => LogLocationWidget(
-                              logLocation: model.list[index],
-                            ),
-                          )
-                        : Text('Não há logs'),
+                    child: Center(
+                      child: StreamBuilder<List<LogLocation>>(
+                        stream: model.list,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<LogLocation>> snapshot) {
+                          if (snapshot.hasData) {
+                            if (snapshot.data.isEmpty) {
+                              return Text('Não há logs');
+                            } else {
+                              return Align(
+                                alignment: Alignment.topCenter,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) =>
+                                      LogLocationWidget(
+                                    logLocation: snapshot.data[index],
+                                  ),
+                                ),
+                              );
+                            }
+                          } else {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else {
+                              return Text('Não há logs');
+                            }
+                          }
+                        },
+                      ),
+                    ),
                   )
                 ],
               ),
