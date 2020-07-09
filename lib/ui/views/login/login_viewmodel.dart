@@ -1,34 +1,36 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../../services/auth_service.dart';
 import '../../../app/locator.dart';
 import '../../../app/router.gr.dart';
 
 class LoginViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = locator<AuthService>();
 
-  FirebaseUser _user;
   String _email;
-  String get email => _email;
   String _password;
+
+  String get email => _email;
   String get password => _password;
-
-  FirebaseUser get user => _user;
-
-  bool get hasUser => _user != null && _user.uid.isNotEmpty;
 
   Future<void> signIn() async {
     setBusy(true);
-    _user = (await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    ))
-        .user;
-    if (hasUser) {
-      debugPrint("Signed in: " + user.email);
+    await _authService.signInWithEmailAndPassword(email, password);
+    if (_authService.hasUser) {
+      debugPrint("Signed in: " + _authService.user.email);
+      await _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
+    }
+    setBusy(false);
+  }
+
+  Future<void> signInAnonymous() async {
+    setBusy(true);
+    await _authService.signInAnonymous();
+    if (_authService.hasUser) {
+      debugPrint("Signed in anonymously");
       await _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
     }
     setBusy(false);

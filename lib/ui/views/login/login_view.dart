@@ -36,7 +36,17 @@ class LoginView extends StatelessWidget {
                             : Text('LOGIN'),
                       )
                     ],
-                  )
+                  ),
+                  FlatButton(
+                    onPressed: () async => await model.signInAnonymous(),
+                    child: model.isBusy
+                        ? SizedBox(
+                            height: 24.0,
+                            width: 24.0,
+                            child: CircularProgressIndicator(),
+                          )
+                        : Text('ANONYMOUS USER'),
+                  ),
                 ],
               ),
             ),
