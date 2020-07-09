@@ -26,13 +26,19 @@ class HomeViewModel extends BaseViewModel {
   Completer<GoogleMapController> get controller => _controller;
   String get userId => _authService.user.uid;
 
-  Future<void> init() async {
+  /// Init location and database services and config
+  /// interval to get location with [getLocationInterval](seconds)
+  Future<void> init({int getLocationInterval = 5}) async {
     _latLng = LatLng(37.43296265331129, -122.08832357078792);
     await _locationService.init();
     await _databaseService.init(userId);
+    // TODO: Create a time service and restart timer when get location manually
+    Timer.periodic(Duration(seconds: getLocationInterval), _getPeriodLocation);
     notifyListeners();
   }
 
+  /// Get location and save in database
+  /// If [random] true, modify original latitude and longitude
   Future<void> getLocation({bool random = false}) async {
     setBusy(true);
     await _locationService.getLocation();
@@ -45,6 +51,10 @@ class HomeViewModel extends BaseViewModel {
       uid: _authService.user.uid,
     ));
     setBusy(false);
+  }
+
+  void _getPeriodLocation(Timer timer) async {
+    await getLocation();
   }
 
   void _travel(bool random) {
