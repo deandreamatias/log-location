@@ -6,9 +6,9 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   AuthResult _authResult;
 
-  FirebaseUser get user => _authResult.user;
+  FirebaseUser get user => _authResult?.user;
   bool get hasUser =>
-      _authResult.user != null && _authResult.user.uid.isNotEmpty;
+      _authResult?.user != null && _authResult?.user.uid.isNotEmpty;
 
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     _authResult = await _auth.signInWithEmailAndPassword(

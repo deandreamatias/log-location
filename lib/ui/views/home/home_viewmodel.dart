@@ -20,6 +20,7 @@ class HomeViewModel extends BaseViewModel {
 
   LatLng _latLng;
   Completer<GoogleMapController> _controller = Completer();
+  Timer _timer;
 
   LatLng get latLng => _latLng;
   Stream<List<LogLocation>> get list => _databaseService.listLocation;
@@ -33,7 +34,8 @@ class HomeViewModel extends BaseViewModel {
     await _locationService.init();
     await _databaseService.init(userId);
     // TODO: Create a time service and restart timer when get location manually
-    Timer.periodic(Duration(seconds: getLocationInterval), _getPeriodLocation);
+    _timer = Timer.periodic(
+        Duration(seconds: getLocationInterval), _getPeriodLocation);
     notifyListeners();
   }
 
@@ -81,6 +83,7 @@ class HomeViewModel extends BaseViewModel {
   Future<void> logout() async {
     await _databaseService.close();
     await _authService.removeUser();
+    _timer.cancel();
     await _navigationService.pushNamedAndRemoveUntil(Routes.loginView);
   }
 }
