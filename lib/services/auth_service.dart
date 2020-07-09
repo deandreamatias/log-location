@@ -20,4 +20,8 @@ class AuthService {
   Future<void> signInAnonymous() async {
     _authResult = await _auth.signInAnonymously();
   }
+
+  Future<void> removeUser() async {
+    _authResult = null;
+  }
 }

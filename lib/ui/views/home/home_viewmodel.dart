@@ -80,6 +80,7 @@ class HomeViewModel extends BaseViewModel {
 
   Future<void> logout() async {
     await _databaseService.close();
+    await _authService.removeUser();
     await _navigationService.pushNamedAndRemoveUntil(Routes.loginView);
   }
 }
