@@ -20,7 +20,6 @@ class LoginViewModel extends BaseViewModel {
     setBusy(true);
     await _authService.signInWithEmailAndPassword(email, password);
     if (_authService.hasUser) {
-      debugPrint("Signed in: " + _authService.user.email);
       await _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
     }
     setBusy(false);
@@ -30,7 +29,6 @@ class LoginViewModel extends BaseViewModel {
     setBusy(true);
     await _authService.signInAnonymous();
     if (_authService.hasUser) {
-      debugPrint("Signed in anonymously");
       await _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
     }
     setBusy(false);

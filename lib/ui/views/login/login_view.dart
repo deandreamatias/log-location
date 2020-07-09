@@ -68,6 +68,9 @@ class _LoginForm extends HookViewModelWidget<LoginViewModel> {
       children: <Widget>[
         TextField(
           controller: email,
+          enableSuggestions: true,
+          autocorrect: true,
+          autofocus: true,
           keyboardType: TextInputType.emailAddress,
           onChanged: model.updateEmail,
         ),
