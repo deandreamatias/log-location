@@ -5,6 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../../models/log_location.dart';
+import '../../../services/auth_service.dart';
 import '../../../app/locator.dart';
 import '../../../app/router.gr.dart';
 import '../../../services/location_service.dart';
@@ -12,12 +14,17 @@ import '../../../services/location_service.dart';
 class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
   final LocationService _locationService = locator<LocationService>();
+  final AuthService _authService = locator<AuthService>();
 
   LatLng _latLng;
+  List<LogLocation> _list = [];
   Completer<GoogleMapController> _controller = Completer();
 
   LatLng get latLng => _latLng;
+  List<LogLocation> get list => _list;
   Completer<GoogleMapController> get controller => _controller;
+  String get userId => _authService.hasUser ? _authService.user.uid : 'No user';
+  bool get hasListItems => _list != null && _list.isNotEmpty;
 
   Future<void> init() async {
     _latLng = LatLng(37.43296265331129, -122.08832357078792);
@@ -28,11 +35,18 @@ class HomeViewModel extends BaseViewModel {
     setBusy(true);
     await _locationService.getLocation();
     _travel(random);
+    _list
+      ..add(LogLocation(
+        latitude: _latLng.latitude,
+        longitude: _latLng.longitude,
+        altitude: _locationService.locationData.altitude,
+        dateTime: DateTime.now(),
+        uid: _authService.user.uid,
+      ));
     setBusy(false);
   }
 
-  Future<void> _travel(bool random) async {
-    final GoogleMapController controller = await _controller.future;
+  void _travel(bool random) {
     if (random) {
       // Get random double to generate random location
       final Random random = Random();
@@ -47,11 +61,6 @@ class HomeViewModel extends BaseViewModel {
         _locationService.locationData.longitude,
       );
     }
-    controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: _latLng, zoom: 15.0),
-      ),
-    );
   }
 
   Future<void> logout() async {

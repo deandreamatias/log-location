@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stacked/stacked.dart';
 
-import '../../../ui/views/home/home_viewmodel.dart';
+import '../../widgets/log_location_widget.dart';
+import '../../views/home/home_viewmodel.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({Key key}) : super(key: key);
@@ -16,6 +16,7 @@ class HomeView extends StatelessWidget {
         return SafeArea(
           child: Scaffold(
             bottomNavigationBar: BottomAppBar(
+              color: Colors.lightBlueAccent,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,27 +45,33 @@ class HomeView extends StatelessWidget {
                     )
                   : Icon(Icons.location_searching),
             ),
-            body: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: FittedBox(
-                    child: Text('Olá usuário'),
-                  ),
-                ),
-                Expanded(
-                  child: GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: CameraPosition(
-                      target: model.latLng,
-                      zoom: 15.0,
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.lightBlueAccent,
+                    padding: const EdgeInsets.all(16.0),
+                    child: FittedBox(
+                      child: Text(
+                        'Olá ${model.userId}',
+                        style: TextStyle(fontSize: 20.0),
+                      ),
                     ),
-                    onMapCreated: (GoogleMapController controller) {
-                      model.controller.complete(controller);
-                    },
                   ),
-                )
-              ],
+                  Expanded(
+                    child: model.hasListItems
+                        ? ListView.builder(
+                            itemCount: model.list.length,
+                            itemBuilder: (context, index) => LogLocationWidget(
+                              logLocation: model.list[index],
+                            ),
+                          )
+                        : Text('Não há logs'),
+                  )
+                ],
+              ),
             ),
           ),
         );
