@@ -44,3 +44,6 @@ app.*.map.json
 
 # Android
 /android/app/google-services.json
+
+# VS Code
+.vscode
